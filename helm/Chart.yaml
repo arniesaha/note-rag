@@ -1,0 +1,14 @@
+apiVersion: v2
+name: note-rag
+description: Personal knowledge RAG system with hybrid search (BM25 + vector)
+type: application
+version: 1.0.0
+appVersion: "2.0.0"
+keywords:
+  - rag
+  - search
+  - knowledge-base
+  - meeting-notes
+home: https://github.com/arniesaha/note-rag
+sources:
+  - https://github.com/arniesaha/note-rag

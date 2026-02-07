@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: api
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-config
+        - secretRef:
+            name: {{ .Release.Name }}-secrets
+        volumeMounts:
+        - name: obsidian
+          mountPath: /data/obsidian
+          readOnly: true
+        - name: lancedb
+          mountPath: /data/lancedb
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      - name: obsidian
+        hostPath:
+          path: {{ .Values.volumes.obsidian }}
+          type: Directory
+      - name: lancedb
+        hostPath:
+          path: {{ .Values.volumes.lancedb }}
+          type: DirectoryOrCreate
+---
+{{- if .Values.ollama.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-ollama
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-ollama
+    spec:
+      containers:
+      - name: ollama
+        image: {{ .Values.ollama.image }}
+        ports:
+        - containerPort: 11434
+        resources:
+          {{- toYaml .Values.ollama.resources | nindent 10 }}
+        volumeMounts:
+        - name: ollama-data
+          mountPath: /root/.ollama
+      volumes:
+      - name: ollama-data
+        hostPath:
+          path: {{ .Values.ollama.persistence.path }}
+          type: DirectoryOrCreate
+{{- end }}

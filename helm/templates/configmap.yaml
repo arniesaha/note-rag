@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+  OLLAMA_URL: {{ .Values.config.ollamaUrl | quote }}
+  LANCEDB_PATH: "/data/lancedb"
+  VAULT_WORK_PATH: "/data/obsidian/work"
+  VAULT_PERSONAL_PATH: "/data/obsidian/personal"
+  EXCLUDED_FOLDERS: {{ .Values.config.excludedFolders | quote }}
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
