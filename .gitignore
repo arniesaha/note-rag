@@ -1,0 +1,51 @@
+# Data directories (not for repo)
+lancedb/
+obsidian/
+data/
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+*.egg
+venv/
+.venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files with secrets
+.env
+!.env.example
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+*.bak
+
+# Analysis output (personal data)
+analysis/
+
+# n8n workflow exports (may contain tokens)
+n8n/*.json
+!n8n/README.md

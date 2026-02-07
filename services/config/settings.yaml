@@ -1,0 +1,47 @@
+# note-rag Settings
+
+indexing:
+  chunk_size: 500
+  chunk_overlap: 50
+  batch_size: 10
+  # Reindex strategy
+  incremental: true           # Index on file change
+  full_reindex_day: "sunday"  # Weekly full reindex
+  full_reindex_hour: 3        # 3 AM
+
+search:
+  default_limit: 10
+  max_limit: 50
+  similarity_threshold: 0.7
+  # Search modes: vector, bm25, hybrid, query
+  default_mode: hybrid
+
+reranking:
+  enabled: true
+  model: "qwen2.5:0.5b"       # Fast model for reranking
+  top_k: 30                    # Rerank top N results
+  concurrency: 5               # Parallel reranking calls
+
+query_expansion:
+  enabled: true
+  model: "qwen2.5:0.5b"
+  max_alternatives: 2
+
+rag:
+  model: "claude-sonnet-4-20250514"  # Or your preferred model
+  max_context_chunks: 5
+  temperature: 0.3
+  excluded_folders:           # Never send to LLM
+    - "personal/finance"
+
+watcher:
+  enabled: false              # Enable for auto-reindex
+  debounce_seconds: 30
+  patterns:
+    - "*.md"
+
+backup:
+  enabled: false
+  schedule: "0 3 * * *"       # Daily at 3 AM
+  retention_days: 7
+  # path: "/path/to/backups"  # Set your backup path

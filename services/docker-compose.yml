@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: note-rag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api:
+    build: ./api
+    image: note-rag-api:latest
+    container_name: note-rag-api
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount your Obsidian vault(s) and LanceDB storage
+      # Set OBSIDIAN_PATH and LANCEDB_PATH in .env or environment
+      - ${OBSIDIAN_PATH:?Set OBSIDIAN_PATH in .env}:/data/obsidian:ro
+      - ${LANCEDB_PATH:?Set LANCEDB_PATH in .env}:/data/lancedb
+      - ./config:/app/config
+    env_file:
+      - .env
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - LANCEDB_PATH=/data/lancedb
+      - VAULT_WORK_PATH=/data/obsidian/work
+      - VAULT_PERSONAL_PATH=/data/obsidian/personal
+      - EXCLUDED_FOLDERS=${EXCLUDED_FOLDERS:-personal/finance}
+      - CLAWDBOT_URL=${CLAWDBOT_URL:-http://host.docker.internal:18789}
+      - CLAWDBOT_TOKEN=${CLAWDBOT_TOKEN}
+      - API_TOKEN=${API_TOKEN}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  ollama_data:
