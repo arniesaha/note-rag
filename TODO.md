@@ -1,11 +1,17 @@
-# note-rag TODO
+# Recall TODO
 
-## 🔴 URGENT: Sync Broken (Feb 11, 2026)
+## 🎉 Rebranded from note-rag → Recall (Feb 13, 2026)
+
+---
+
+## 🔴 Known Issues
+
+### Sync Broken (Feb 11, 2026)
 - Granola transcript sync stopped after Feb 6
 - No meeting files from Feb 7-11 present
 - **Action:** Check n8n workflow or daily_sync.py script
 
-## 🔴 BUG: Hybrid Search Broken
+### Hybrid Search Bug
 - FTS search failing with `sqlite3.OperationalError: no such column: 1`
 - Happens when using `person` filter
 - **Workaround:** Use `mode: "vector"` instead of `hybrid`
@@ -13,62 +19,82 @@
 
 ---
 
-## Observability Dashboard (P1)
+## ✅ Completed
 
-Build dedicated monitoring for note-rag tracking P50/P95/P99 latencies.
+### PDF Support (Feb 13, 2026)
+- [x] PyMuPDF for text extraction
+- [x] Page-aware chunking with `page_number` metadata
+- [x] `source_type` field ("markdown" or "pdf")
+- [x] Helm chart PDFs volume mount
+- [x] 11 work PDFs added to `/data/pdfs/work/`
 
-### Metrics to Track
-- **Latency (P50/P95/P99)** per endpoint:
-  - `/search` (by mode: vector, bm25, hybrid, query)
-  - `/query` (RAG)
-  - `/prep/{person}`
-  - `/index/start`
-- **Request count** per endpoint
-- **Error rate** per endpoint
-- **Index stats:**
-  - Vector count (work/personal)
-  - FTS count (work/personal)
-  - Last index time
-  - Index job duration
-
-### Implementation: Prometheus + Grafana
-
-```python
-# Add to requirements.txt
-prometheus-fastapi-instrumentator==6.1.0
-
-# Add to main.py
-from prometheus_fastapi_instrumentator import Instrumentator
-Instrumentator().instrument(app).expose(app)
-```
-
-Then:
-1. Scrape `/metrics` endpoint with Prometheus
-2. Build Grafana dashboard with:
-   - Request rate panel
-   - Latency histogram (P50/P95/P99)
-   - Error rate panel
-   - Index health panel
+### API Documentation (Feb 13, 2026)
+- [x] Full API reference at `/docs/API.md`
+- [x] OpenAPI auto-generated at `/docs`, `/redoc`
 
 ---
 
-## PDF Support (Planned)
-- [ ] Add separate PDF paths alongside vaults
-  - `vault_work_pdfs_path: str = "/data/pdfs/work"`
-  - `vault_personal_pdfs_path: str = "/data/pdfs/personal"`
-- [ ] Add PyMuPDF (fitz) for PDF extraction
-- [ ] Page-aware chunking with page number metadata
-- [ ] Update indexer to handle both `.md` and `.pdf`
+## 🚀 UI Roadmap
 
-## Google Workspace Docs (Manual Export Approach)
-- [ ] Export Google Docs/Sheets as PDF from work laptop
-- [ ] Place in `/data/pdfs/work/` folder
-- [ ] Index via PDF loader (once implemented)
+### Phase 1 — Read & Search (MVP)
+- [ ] Browse notes by folder tree
+- [ ] Semantic + keyword search
+- [ ] Note viewer (Markdown rendered)
+- [ ] PDF viewer with page navigation
+- [ ] 1:1 prep dashboard
+- [ ] Mobile-responsive design
+- [ ] Dark mode
 
-**Workflow:**
-1. Open Google Doc/Sheet
-2. File → Download → PDF
-3. Save to `pdfs/work/` folder (synced to NAS)
-4. Trigger reindex
+**Tech stack:** React + Tailwind (or simple FastAPI templates)
 
-*Simpler than full API integration — no auth setup needed*
+### Phase 2 — Write & Capture
+- [ ] Create new notes (web editor)
+- [ ] Edit existing notes
+- [ ] Quick capture (mobile-friendly input)
+- [ ] Upload PDFs via UI
+- [ ] Tag management
+
+### Phase 3 — Intelligence
+- [ ] Daily digest ("What happened today")
+- [ ] Meeting prep auto-generation
+- [ ] Action item extraction & tracking
+- [ ] "Related notes" suggestions
+- [ ] Timeline view
+
+### Phase 4 — Collaboration (Future)
+- [ ] Share notes/searches
+- [ ] Team knowledge base mode
+- [ ] Access controls
+
+---
+
+## 🔧 Backend Improvements
+
+### Observability (P1)
+- [ ] Prometheus metrics endpoint (already added)
+- [ ] Grafana dashboard for latencies
+- [ ] Index health monitoring
+
+### Performance
+- [ ] Batch embedding requests
+- [ ] Incremental FTS updates
+- [ ] Query caching
+
+### Data Sources
+- [ ] Auto-sync from Granola (fix broken sync)
+- [ ] Calendar integration for meeting context
+- [ ] Email ingestion (future)
+
+---
+
+## 📦 Deployment
+
+**Docker Image:** `localhost:5000/recall-api:latest`
+**Helm Release:** `recall`
+**Domain:** `recall.arnabsaha.com`
+**k8s Namespace:** `apps`
+
+**Paths:**
+- Obsidian vault: `/home/Arnab/clawd/projects/recall/obsidian`
+- LanceDB: `/home/Arnab/clawd/projects/recall/lancedb`
+- PDFs: `/home/Arnab/clawd/projects/recall/data/pdfs`
